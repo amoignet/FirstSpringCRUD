@@ -26,7 +26,9 @@ public class TutorialService {
         return tutorialRepository.findById(id);
     }
 
-    public Iterable<Tutorial> getTutorialsByTitle(String title) { return tutorialRepository.findByTitleEquals(title);}
+    public Iterable<Tutorial> getTutorialsByTitle(String title) {
+        return tutorialRepository.findByTitleEquals(title);
+    }
 
     public void deleteTutorial(final Long id) {
         tutorialRepository.deleteById(id);

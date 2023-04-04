@@ -1,7 +1,8 @@
 package com.exampleCRUD.SpringCrud.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.exampleCRUD.SpringCrud.service.TutorialService;
@@ -24,23 +25,17 @@ public class TutorialController {
     }
 
     @GetMapping("/tutorials")
-    public Iterable<Tutorial> getTutorials() {
-        return tutorialService.getTutorials();
+    public Iterable<Tutorial> getTutorials(@RequestParam(required = false) String title) {
+            if (title == null)
+               return tutorialService.getTutorials();
+            else
+               return tutorialService.getTutorialsByTitle(title);
     }
 
     @GetMapping("/tutorials/{id}")
     public Tutorial getTutorial(@PathVariable("id") final Long id) {
         Optional<Tutorial> tutorial = tutorialService.getTutorialById(id);
-        if (tutorial.isPresent()) {
-            return tutorial.get();
-        } else {
-            return null;
-        }
-    }
-
-    @GetMapping("/tutorials/title")
-    public Iterable<Tutorial> findTutorialsByTitle(@RequestParam("title") String title)  {
-        return tutorialService.getTutorialsByTitle(title);
+        return tutorial.orElse(null);
     }
 
     @PutMapping("/tutorials/{id}")
@@ -49,14 +44,24 @@ public class TutorialController {
     }
 
     @DeleteMapping("/tutorials/{id}")
-    public void deleteTutorial(@PathVariable("id") final Long id) {
-        tutorialService.deleteTutorial(id);
+    public ResponseEntity<HttpStatus> deleteTutorial(@PathVariable("id") final Long id) {
+        try {
+            tutorialService.deleteTutorial(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @DeleteMapping("/tutorials")
-    public void deleteAllTutorials() {
-        tutorialService.deleteAll();
-    }
+    public ResponseEntity<HttpStatus> deleteAllTutorials() {
+        try {
+            tutorialService.deleteAll();
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
+    }
 
 }
